@@ -43,20 +43,17 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to Minikube') {
             steps {
                 script {
-                    // Ensure Jenkins uses the correct kubeconfig
-                    sh "cp ~/.kube/config /var/lib/jenkins/.kube/config"  // Update this path based on where Jenkins is running
-
-                    // Ensure correct kube context
+                    // Ensure the right Minikube context
                     sh "kubectl config use-context minikube"
 
-                    // Delete existing deployment/service if any
+                    // Delete existing deployment and service if any
                     sh "kubectl delete deployment student-app-deployment --ignore-not-found"
                     sh "kubectl delete service student-app-service --ignore-not-found"
 
-                    // Apply new configs
+                    // Apply Kubernetes YAML files
                     sh "kubectl apply -f k8s/deployment.yaml"
                     sh "kubectl apply -f k8s/service.yaml"
                 }
