@@ -46,6 +46,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
+                    // Ensure Jenkins uses the correct kubeconfig
+                    sh "cp ~/.kube/config /var/lib/jenkins/.kube/config"  // Update this path based on where Jenkins is running
+
                     // Ensure correct kube context
                     sh "kubectl config use-context minikube"
 
