@@ -46,14 +46,7 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 script {
-                    // Ensure the right Minikube context
-                    sh "kubectl config use-context minikube"
-
-                    // Delete existing deployment and service if any
-                    sh "kubectl delete deployment student-app-deployment --ignore-not-found"
-                    sh "kubectl delete service student-app-service --ignore-not-found"
-
-                    // Apply Kubernetes YAML files
+                    
                     sh "kubectl apply -f k8s/deployment.yaml"
                     sh "kubectl apply -f k8s/service.yaml"
                 }
