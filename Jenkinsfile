@@ -48,6 +48,15 @@ pipeline {
             }
         }
 
+        stage('Start Minikube') {
+            steps {
+                script {
+                    // Start Minikube if it's not already running
+                    sh "minikube start"
+                }
+            }
+        }
+
         stage('Get IP Address') {
             steps {
                 script {
