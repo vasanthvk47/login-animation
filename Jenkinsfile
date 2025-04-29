@@ -53,14 +53,6 @@ pipeline {
             }
         }
 
-        stage('Get IP Address') {
-            steps {
-                script {
-                    def serviceUrl = sh(script: "minikube service student-app-service --url", returnStdout: true).trim()
-                    echo "✅ App is live at: $serviceUrl"
-                    currentBuild.description = "🌐 App URL: $serviceUrl"
-                }
-            }
-        }
+        
     }
 }
