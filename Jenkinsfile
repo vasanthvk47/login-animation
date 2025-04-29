@@ -7,6 +7,15 @@ pipeline {
     }
 
     stages {
+        stage('Start Minikube') {
+            steps {
+                script {
+                    // Start Minikube if it's not already running
+                    sh "minikube status || minikube start"
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/vasanthvk47/login-animation.git'
@@ -37,22 +46,16 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Delete existing services and deployments
-                    sh "kubectl delete deployment student-app-deployment || true"
-                    sh "kubectl delete service student-app-service || true"
-                    
-                    // Deploy the new application
+                    // Ensure correct kube context
+                    sh "kubectl config use-context minikube"
+
+                    // Delete existing deployment/service if any
+                    sh "kubectl delete deployment student-app-deployment --ignore-not-found"
+                    sh "kubectl delete service student-app-service --ignore-not-found"
+
+                    // Apply new configs
                     sh "kubectl apply -f k8s/deployment.yaml"
                     sh "kubectl apply -f k8s/service.yaml"
-                }
-            }
-        }
-
-        stage('Start Minikube') {
-            steps {
-                script {
-                    // Start Minikube if it's not already running
-                    sh "minikube start"
                 }
             }
         }
@@ -60,12 +63,9 @@ pipeline {
         stage('Get IP Address') {
             steps {
                 script {
-                    // Get the Minikube service URL for the deployed application
                     def serviceUrl = sh(script: "minikube service student-app-service --url", returnStdout: true).trim()
-                    echo "Service is available at: $serviceUrl"
-                    
-                    // Optionally, display the URL for reviewer
-                    currentBuild.description = "Access the application at: $serviceUrl"
+                    echo "✅ App is live at: $serviceUrl"
+                    currentBuild.description = "🌐 App URL: $serviceUrl"
                 }
             }
         }
